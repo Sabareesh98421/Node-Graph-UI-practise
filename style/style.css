@@ -1,0 +1,67 @@
+/* style.css */
+.grid-style-bg {
+    position: relative;
+    background-image:
+        repeating-linear-gradient(to right, #4b5563a2 0 0.5px, transparent 0.5px 6px),
+        repeating-linear-gradient(to bottom, #4b5563a2 0 0.5px, transparent 0.5px 6px); 
+    /* background-image:
+        repeating-linear-gradient(to right, #4b5563a2 0 1px, transparent 1px 24px),
+        repeating-linear-gradient(to bottom, #4b5563a2 0 1px, transparent 1px 24px); */
+
+    background-size: 6px 6px;
+    backdrop-filter: blur(2px);
+    /* 👈 subtle tiny blur */
+    background-color: rgba(15, 23, 42, 0.65);
+    /* translucent so blur is visible */
+}
+
+#workSpace {
+    overflow: auto;
+}
+
+#workSpace::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background-image:
+        repeating-linear-gradient(to right, #4b5563a2 0 0.5px, transparent 0.5px 6px),
+        repeating-linear-gradient(to bottom, #4b5563a2 0 0.5px, transparent 0.5px 6px);
+    background-size: 6px 6px;
+    backdrop-filter: blur(2px);
+    /* 👈 subtle tiny blur */
+    background-color: rgba(15, 23, 42, 0.65);
+}
+
+.nodes {
+    position: absolute;
+    width: 120px;
+    height: 200px;
+    border-radius: 0.5rem;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: grab;
+    user-select: none;
+    flex-flow: column;
+}
+
+.nodeHeader {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nodeMain {
+    flex: 1;
+    /* fills remaining height after header */
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
