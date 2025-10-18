@@ -1,39 +1,47 @@
 /* style.css */
+
 .grid-style-bg {
     position: relative;
     background-image:
         repeating-linear-gradient(to right, #4b5563a2 0 0.5px, transparent 0.5px 6px),
-        repeating-linear-gradient(to bottom, #4b5563a2 0 0.5px, transparent 0.5px 6px); 
-    /* background-image:
-        repeating-linear-gradient(to right, #4b5563a2 0 1px, transparent 1px 24px),
-        repeating-linear-gradient(to bottom, #4b5563a2 0 1px, transparent 1px 24px); */
-
+        repeating-linear-gradient(to bottom, #4b5563a2 0 0.5px, transparent 0.5px 6px);
     background-size: 6px 6px;
-    backdrop-filter: blur(2px);
-    /* 👈 subtle tiny blur */
-    background-color: rgba(15, 23, 42, 0.65);
-    /* translucent so blur is visible */
+    background-color: rgba(15, 23, 42, 0.9);
+    filter: blur(2);
+}
+
+#workflow-container {
+    overflow: hidden;
+    position: relative;
 }
 
 #workSpace {
+    outline: 2px solid red;
     overflow: auto;
 }
 
-#workSpace::before {
-    content: "";
+
+#grid-canvas-bg,
+#node-connector-canvas {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
     height: 100%;
+    width: 100%;
+    z-index: 0;
     pointer-events: none;
-    background-image:
-        repeating-linear-gradient(to right, #4b5563a2 0 0.5px, transparent 0.5px 6px),
-        repeating-linear-gradient(to bottom, #4b5563a2 0 0.5px, transparent 0.5px 6px);
-    background-size: 6px 6px;
-    backdrop-filter: blur(2px);
-    /* 👈 subtle tiny blur */
-    background-color: rgba(15, 23, 42, 0.65);
+}
+
+#grid-canvas-bg {
+    background-image: radial-gradient(#4b5563a2 0.8px, transparent 1px);
+    background-size: 20px 20px;
+    background-color: rgba(15, 23, 42, 0.9);
+    width: 100%;
+    /* filter: blur(2); */
+}
+
+#node-connector-canvas {
+    z-index: 1;
 }
 
 .nodes {
@@ -48,6 +56,7 @@
     cursor: grab;
     user-select: none;
     flex-flow: column;
+
 }
 
 .nodeHeader {

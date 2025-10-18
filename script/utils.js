@@ -23,8 +23,10 @@ function cardContent(data) {
 }
 
 export function card(node) {
+    console.warn(node)
     const el = document.createElement("div");
     el.className = "nodes";
+    el.id = "Node-" + node.nodeId
     el.style.left = node.selfPosition.x + "px";
     el.style.top = node.selfPosition.y + "px";
     // el.id = `node-#{node.nodeId}`;
@@ -33,7 +35,7 @@ export function card(node) {
     domElements("#workSpace").appendChild(el);
     el.appendChild(cardHeader(node.displayName + " - " + node.nodeId));
     el.appendChild(cardContent(node.nodeData));
-    const dragNDrop = new DragNDrop().setElement(el);
+    new DragNDrop().setElement(el);
     return el;
 }
 
@@ -91,7 +93,6 @@ export class DragNDrop {
         this.#node.style.left = Math.min(Math.max(0, newX), maxX) + "px";
         this.#node.style.top = Math.min(Math.max(0, newY), maxY) + "px";
 
-
     }
     drop() {
         if (!this.#isDragging) return;
@@ -99,3 +100,5 @@ export class DragNDrop {
         this.#node.style.cursor = "grab";
     }
 }
+
+

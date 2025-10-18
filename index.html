@@ -9,11 +9,13 @@
         <script
             src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     </head>
-    <body class="h-screen absolute w-screen  bg-slate-900 flex ">
+    <body class="h-screen relative w-screen  bg-slate-900 flex ">
         <nav
-            class="h-screen w-[8.5rem] flex p-2  shadow-xl  bg-slate-800 text-white  b-gray-400 border-r-1 border-gray-500 overflow-hidden flex flex-col  ">
+            class="p-2 flex shadow-xl  bg-slate-800 text-white border-r-1 border-gray-500 overflow-hidden  h-full justify-center align-center">
             <section class="flex h-full w-full">
                 <ul class="flex h-full w-full flex-col p-2 ">
+                    <li 
+                    class="border-b-1 hover:bg-gray-900  border-gray-500 w-full" id="createNode">Add node</li>
                     <li
                         class="border-b-1 hover:bg-gray-900  border-gray-500 w-full">Hello</li>
                     <li
@@ -28,12 +30,14 @@
             </section>
         </nav>
         <main id="main"
-            class="flex-1 relative overflow-auto h-full">
+            class="flex-1 relative  h-full w-full ">
             <section id="workflow-container"
-                class="absolute top-0 left-0 w-full h-full">
+                class="absolute top-0 left-0 w-full h-full overflow-auto">
+                <canvas id="grid-canvas-bg" class="w-full"></canvas>
+                <canvas id="node-connector-canvas"></canvas>
                 <div id="workSpace"
-                    class="grid-style-bg relative w-[5000px] h-[5000px]">
-
+                    class=" relative  h-full  ">
+                    <!-- grid-style-bg -->
                 </div>
             </section>
         </main>
