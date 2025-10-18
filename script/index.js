@@ -26,9 +26,10 @@ let node1 = {
     boundary: wSBoundary
 };
 
-const node = new Node(node1);
-// card(node);
-const node2 = new Node(node1)
+// const node = new Node(node1);
+// // card(node);
+// const node2 = new Node(node1)
 // card(node2)
-wS.addNodeToWorkshopList([node, node2])
-console.log(wS.nodes)
+// wS.addNodeToWorkshopList([node, node2])
+
+// console.log(wS.nodes)
