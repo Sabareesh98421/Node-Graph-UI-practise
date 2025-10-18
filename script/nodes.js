@@ -4,11 +4,11 @@ export class Node {
 
     static nodeId = 0;
     // to know those nodes are available or not 
-    connectionPoints={
-        left:false,
-        right:false,
-        top:false,
-        bottom:false
+    connectionPoints = {
+        left: false,
+        right: false,
+        top: false,
+        bottom: false
     };
     constructor(props) {
         this.nodeId = ++Node.nodeId;
@@ -41,7 +41,7 @@ export class Node {
         if (Math.random() < 0.5) {
             this.selfPosition.x += this.$ensureNodeSpawnPositionRestricted(Math.random() * 50, "x");
         } else {
-            this.selfPosition.y += this.selfPosition.y += this.$ensureNodeSpawnPositionRestricted(Math.random() * 50, "y");
+            this.selfPosition.y += this.$ensureNodeSpawnPositionRestricted(Math.random() * 50, "y");
         }
 
     }
@@ -55,6 +55,22 @@ export class Node {
         if (this.nodeId === 1 || !this.boundary) return;
         const max = axis === "x" ? this.boundary.width : this.boundary.height
         return calculatedValue < max ? calculatedValue : max - 10
+    }
+    // serialization
+    toJson() {
+
+        // return { ...this }
+        return JSON.stringify(this);
+    }
+    static fromJSON(jsonedNode) {
+        const node = Object.create(Node.prototype);
+        Object.assign(node, jsonedNode);
+
+        // static NodeId counter Update
+        if (node.nodeId >= Node.nodeId) {
+            Node.nodeId = node.nodeId;
+        }
+        return node;
     }
 }
 
