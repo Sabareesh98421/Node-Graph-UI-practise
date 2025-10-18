@@ -2,6 +2,9 @@
 export function body() {
     return document.body;
 }
+export function workspace(){
+    return domElements("#workSpace");
+}
 export function domElements(selector, isEverything = false) {
     if (!isEverything) return document.querySelector(String(selector));
     return document.querySelectorAll(String(selector))
@@ -23,13 +26,12 @@ function cardContent(data) {
 }
 
 export function card(node) {
-    console.warn(node)
     const el = document.createElement("div");
     el.className = "nodes";
-    el.id = "Node-" + node.nodeId
+    // el.id = "Node-" + node.nodeId
     el.style.left = node.selfPosition.x + "px";
     el.style.top = node.selfPosition.y + "px";
-    // el.id = `node-#{node.nodeId}`;
+    el.id = `node-${node.nodeId}`;
     // el.textContent = node.displayName + "hi";
     setStyleToNode(el);
     domElements("#workSpace").appendChild(el);
@@ -50,7 +52,7 @@ function setStyleToNode(el) {
 
 
 
-// an utils function for drag and drop this method is about to set inthe addeventlistenr 
+// an utils function for drag and drop this method is about to set in the add event listener 
 export class DragNDrop {
     #isDragging = false;
     #offsetX = 0;
@@ -66,7 +68,6 @@ export class DragNDrop {
     }
     #enable() {
         if (!this.#node) return
-        console.log(this.#node)
         this.#node.addEventListener("mousedown", (eve) => this.grab(eve));
     }
 
