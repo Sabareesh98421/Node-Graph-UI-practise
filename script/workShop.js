@@ -4,7 +4,7 @@ import { Node } from "./nodes.js"
 import canvasBg from "./canvas.js";
 export class WorkShop {
     /***
-     * @type Array<Node>
+     * @type Set<Node>
      */
     nodes = []
     #scale = 1;
@@ -81,7 +81,7 @@ export class WorkShop {
         this.#scale = newScale;
         return [newScale, oldScale]
     }
-    // ADD THIS NEW METHOD
+
     #updateAllNodePositions() {
         const nodeElements = domElements(".nodes", true);
         nodeElements.forEach((nodeEl) => {
@@ -102,34 +102,22 @@ export class WorkShop {
         });
     }
     #addNodeToWorkshopList(nodes) {
+        if (Array.isArray(nodes)) return this.#setArrayOFNodesToWorkSpaceList(nodes);
+        if (!(nodes instanceof Node)) throw new TypeError("The node must be an instanceof Node")
+        this.nodes.add(nodes)
 
-        // this.#checkIsValidArgumentsType(node, { type: Array, of: Node });
-        if (!(Array.isArray(nodes))) {
-            this.nodes.push(nodes)
-            this.#setNodeInFromLocalStorage();
-            return;
-        }
-        nodes.forEach(() => {
-            this.nodes.push(nodes)
-        })
+        
         this.#setNodeInFromLocalStorage();
         return;
     }
-    // this is redundant done by willingly 
-    addNodeToWorkshopList(nodes) {
-        // this.#checkIsValidArgumentsType(node, { type: Array, of: Node });
-        if (!(Array.isArray(nodes))) {
-            this.nodes.push(nodes)
-            this.#setNodeInFromLocalStorage();
-            return;
-        }
-        nodes.forEach(() => {
-            this.nodes.push(nodes)
+    #setArrayOFNodesToWorkSpaceList(nodes) {
+        nodes.forEach((node) => {
+            if (!(node instanceof Node)) throw new TypeError("The node must be an instanceof Node")
+            this.nodes.add(node)
         })
         this.#setNodeInFromLocalStorage();
-        return;
-    }
 
+    }
 
     createNode() {
         let randomNumber = Math.floor(Math.random() * 100)
@@ -141,59 +129,34 @@ export class WorkShop {
                 width: this.workSpaceSize.width
             }
         };
-
         let node = new Node(nodeData);
         card(node);
         this.#addNodeToWorkshopList(node)
     }
+
     #createCards() {
+
         this.nodes.forEach(node => {
             card(node);
         })
     }
+
     #getNodesFromLocalStorage() {
         let keyname = "nodes"
-        return JSON.parse(localStorage.getItem(keyname));
+        this.nodes = new Set(JSON.parse(localStorage.getItem(keyname))) || this.nodes;
+        // return this.#covertParsedJsonToNodeInstance();
+        return this.nodes;
     }
+
+    #covertParsedJsonToNodeInstance() {
+        this.nodes.map((eachNode) => JSON.parse(eachNode));
+        return this.nodes;
+    }
+
     #setNodeInFromLocalStorage() {
         let keyName = "nodes";
-        localStorage.setItem(keyName, JSON.stringify(this.nodes));
+        localStorage.setItem(keyName, JSON.stringify([...this.nodes]));
     }
 }
 
 
-
-// waste of times
-function typeCheckForCollections(value, expectedType) {
-    // Case 1: Expected a collection (like Array<Node>)
-    if (expectedType.type !== Array) throw new TypeError("the collection is not in an Array")
-    if (!Array.isArray(value))
-        throw new TypeError(`Expected an Array, got ${value?.constructor?.name || typeof value}`);
-
-    if (expectedType.of) {
-        for (const item of value) {
-            // this.#checkIsValidArgumentsType(item, expectedType.of);
-        }
-    }
-    return;
-}
-function checkIsValidArgumentsType(value, expectedType) {
-    // if (typeof expectedType === "object") return this.#typeCheckForCollections(value, expectedType);
-
-    // Case 2: Expected a plain Array
-    if (expectedType === Array) {
-        if (!Array.isArray(value))
-            throw new TypeError(`Expected value to be an Array`);
-        return;
-    }
-
-    // Case 3: Expected a specific class (Node, etc.)
-    // Make sure expectedType is callable (constructor)
-    if (typeof expectedType !== "function") {
-        throw new TypeError(`Invalid type passed to type checker: ${expectedType}`);
-    }
-    // Case 4: Expected a class instance (like Node)
-    if (!(value instanceof expectedType)) {
-        throw new TypeError(`Expected instance of ${expectedType.name}, got ${value?.constructor?.name || typeof value}`);
-    }
-}
