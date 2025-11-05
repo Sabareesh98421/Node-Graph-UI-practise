@@ -1,12 +1,14 @@
 // nodeToNodeConnection.js
 import { Node } from "./nodes.js";
 import { svgLayer } from "./connectorUtils.js";
-import { edgeAnchorPoints } from "./utils.js";
+import { domElements, edgeAnchorPoints } from "./utils.js";
 export default class NodeConnection {
     connector = {
-        start: 0,
-        end: 0 // another node's ID 
+        start: "",
+        end: "" // another node's ID 
     }
+    #startAnchorPosition = { x: 0, y: 0 };
+    #endAnchorPosition = { x: 0, y: 0 };
 
     // this id Represent each edge of the nodes that this connects
 
@@ -20,36 +22,50 @@ export default class NodeConnection {
 
     constructor(connector) {
         this.#setId()
+
         this.#setEventListenersToEdgeAnchors();
+        console.warn("edge :", connector);
     }
 
     #draw() {
         let { SVG, styleSvg } = svgLayer();
         // calculate line position
-        const x1 = startNode.x;
-        const y1 = startNode.y;
-        const x2 = endNode.x;
-        const y2 = endNode.y;
+        const x1 = this.#startAnchorPosition.x;
+        const y1 = this.#startAnchorPosition.y;
+        const x2 = this.#endAnchorPosition.x;
+        const y2 = this.#endAnchorPosition.y;
         SVG.setAttribute("x1", x1);
         SVG.setAttribute("y1", y1);
         SVG.setAttribute("x2", x2);
         SVG.setAttribute("y2", y2);
         styleSvg(SVG); // default style
     }
+
     #setId() {
         this.#id = this.connector.start + "-" + this.connector.end;
     }
     get id() {
         return this.#id;
     }
+    #getAnchorPosition() {
+        console.warn(this.connector)
+        const anchorEle = domElements(`.${this.connector.start}`);
+        const style = getComputedStyle(anchorEle);
+        this.#startAnchorPosition.x = parseFloat(style.left);
+        this.#startAnchorPosition.y = parseFloat(style.top)
+
+    }
     #handleMouseDown_StartAnchor(eve) {
         this.connector.start = this.#getAnchorId(eve.target);
+        this.#getAnchorPosition()
 
+        console.warn("connector.start", this.connector.start)
     }
     #handleMouseUp_EndAnchor(eve) {
         const end = this.#getAnchorId(eve.target);
         if (this.#isBreakConnection(end)) return
         this.connector.end = end
+        console.warn("connector.end", this.connector.end)
     }
     #isBreakConnection(endAnchorId) {
         return this.connector.start === endAnchorId;

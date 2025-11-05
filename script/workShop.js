@@ -198,7 +198,7 @@ export class WorkShop {
             console.log(node.nodeId)
             return;
         }
-        this.#setEndNode(state, node)
+        // this.#setEndNode(state, node)
         this.#restStates()
     }
     #setEndNode(state, node) {

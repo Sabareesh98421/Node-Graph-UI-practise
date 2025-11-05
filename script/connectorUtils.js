@@ -16,7 +16,7 @@ export function svgLayer() {
 }
 
 
-function styleSvg(SVG, attribute = {}) {
+function styleSvg(SVG, attribute = { position: { x: 0, y: 0 }, definePath: '', color: 'black' }) {
     if (!(SVG instanceof SVGElement)) {
         throw new TypeError(`ExpectedElement is SVG `)
     }
@@ -26,7 +26,7 @@ function styleSvg(SVG, attribute = {}) {
     svgStyle.left = attribute.position.x || 0;
     svgStyle.pointerEvents = "none";
     SVG.setAttribute('d', attribute.definePath);
-    SVG.setAttribute('stroke', conn.color);
+    SVG.setAttribute('stroke', attribute.color);
     SVG.setAttribute('class', 'connection-line');
     SVG.setAttribute('stroke-dasharray', '10 5');
 }

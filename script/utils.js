@@ -17,6 +17,7 @@ export function mainTag() {
     return domElements("main");
 }
 export function domElements(selector, isEverything = false) {
+    
     if (!isEverything) return document.querySelector(String(selector));
     return document.querySelectorAll(String(selector))
 
@@ -72,8 +73,8 @@ function createSpanTags(requiredSpan, node) {
     requiredSpan.map((eachSpan, index) => {
         let [, , role] = eachSpan.split("-");
         let span = document.createElement("span");
-        span.setAttribute("id", `node${node.nodeId}--${eachSpan}-${index}`);
-        span.setAttribute("class", `spanTags  connector--${node.nodeId} edgeConnector ${role}`);
+        span.setAttribute("id", `Anchor_Of_node${node.nodeId}--${eachSpan}-${index}`);
+        span.setAttribute("class", `spanTags  connector--${node.nodeId} edgeConnector ${role} Anchor_Of_node${node.nodeId}`);
         // span.style[position] = "0px";
         // span.style[place] = "0px";
         spansTags.push(span);
