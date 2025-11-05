@@ -1,12 +1,14 @@
 // workShop.js
-import { card, domElements } from "./utils.js";
+import { cardWrapper, domElements, mainTag, workspace } from "./utils.js";
 import { Node } from "./nodes.js"
 import canvasBg from "./canvas.js";
+import NodeConnection from "./nodeToNodeConnection.js";
+
 export class WorkShop {
     /***
      * @type Set<Node>
      */
-    nodes = []
+    nodes = new Set();
     #scale = 1;
     #translate = {
         tx: 0,
@@ -17,34 +19,40 @@ export class WorkShop {
         width: 0
     }
     #canvas = null;
+    connectionState = {
+        startNode: null,
+        endNode: null
+    }
     constructor() {
         this.workSpaceSize = {
-            height: domElements("main").clientHeight,
-            width: domElements("main").clientWidth
+            height: mainTag().clientHeight,
+            width: mainTag().clientWidth
         }
         this.#canvas = new canvasBg();
         // this.#canvas.drawGrid(this.#scale, this.#translate);
-        this.#getWorkspace().addEventListener("wheel", (eve) => {
+        workspace().addEventListener("wheel", (eve) => {
             if (!eve.ctrlKey) return
             eve.preventDefault();
             this.#zoom(eve.deltaY, eve);
         })
-        this.#getWorkspace().style.transformOrigin = "0 0";
+        workspace().style.transformOrigin = "0 0";
         this.nodes = this.#getNodesFromLocalStorage() || this.nodes;
         this.#createCards();
+
+
+        // edge Connector Class 
+        new NodeConnection()
     }
 
-    #getWorkspace() {
-        return domElements("#workSpace")
-    }
+
     #zoom(delta, event) {
-        const workspace = this.#getWorkspace();
-        const rect = workspace.getBoundingClientRect();
+        const workSpace = workspace();
+        const rect = workSpace.getBoundingClientRect();
 
         const [newScale, oldScale] = this.#zoomFactor(delta)
 
         // Get current transform values
-        const currentTransform = workspace.style.transform || "translate(0px, 0px) scale(1)";
+        const currentTransform = workSpace.style.transform || "translate(0px, 0px) scale(1)";
         const translateMatch = currentTransform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
         console.log(translateMatch)
         const tx = translateMatch ? parseFloat(translateMatch[1]) : 0;
@@ -106,17 +114,17 @@ export class WorkShop {
         if (!(nodes instanceof Node)) throw new TypeError("The node must be an instanceof Node")
         this.nodes.add(nodes)
 
-        
+
         this.#setNodeInFromLocalStorage();
         return;
     }
+
     #setArrayOFNodesToWorkSpaceList(nodes) {
         nodes.forEach((node) => {
             if (!(node instanceof Node)) throw new TypeError("The node must be an instanceof Node")
             this.nodes.add(node)
         })
         this.#setNodeInFromLocalStorage();
-
     }
 
     createNode() {
@@ -130,32 +138,78 @@ export class WorkShop {
             }
         };
         let node = new Node(nodeData);
-        card(node);
+        nodeData.selfPosition = node.getSelfPosition();
         this.#addNodeToWorkshopList(node)
+        // planning to create the self Conscious node
+        let nodeEleRef = cardWrapper(node);
+        // node.setSelfRefEle(nodeEleRef);
     }
 
     #createCards() {
-
         this.nodes.forEach(node => {
-            card(node);
+            // if (!(node instanceof Node)) { throw ReferenceError("the instanceof of the node is not node itslef") }
+            let nodeEle = cardWrapper(node);
+            // node.setSelfRefEle(nodeEle);
+            nodeEle.addEventListener("click", (eve) => {
+                this.handleNodeClick(eve, node)
+            })
         })
+    }
+
+    #createConnection(targetedNode) {
+        // if (!(targetedNode instanceof Node)) return;
+        console.log(targetedNode)
+        new NodeConnection(targetedNode);
+    }
+
+    #instanizerFromObjLit() {
+        if (!(this.nodes.length)) return;
+        this.nodes = new Set([...this.nodes].map(node =>
+            new Node(node)
+        ))
     }
 
     #getNodesFromLocalStorage() {
         let keyname = "nodes"
         this.nodes = new Set(JSON.parse(localStorage.getItem(keyname))) || this.nodes;
-        // return this.#covertParsedJsonToNodeInstance();
-        return this.nodes;
-    }
+        this.#instanizerFromObjLit();
 
-    #covertParsedJsonToNodeInstance() {
-        this.nodes.map((eachNode) => JSON.parse(eachNode));
-        return this.nodes;
+        return this.nodes
     }
 
     #setNodeInFromLocalStorage() {
         let keyName = "nodes";
         localStorage.setItem(keyName, JSON.stringify([...this.nodes]));
+    }
+
+    handleNodeClick(eve, node) {
+        const target = eve.target;
+        if (!(target instanceof HTMLDivElement)) {
+            return null;
+        }
+        if (!(target.classList.contains("nodes"))) {
+            return null;
+        }
+        console.log(target);
+        console.warn(target.id);
+        const state = this.connectionState;
+        if (!state.startNode) {
+            state.startNode = node;
+            console.log(node.nodeId)
+            return;
+        }
+        this.#setEndNode(state, node)
+        this.#restStates()
+    }
+    #setEndNode(state, node) {
+        // IDK the comparition check the node itself or the reference so I just use nodeID  just for my own consern if IAm wrong I am willingly to correct it 
+        if (state.startNode && state.startNode.nodeId !== node.nodeId) {
+            state.endNode = node
+            this.#createConnection(state)
+        }
+    }
+    #restStates() {
+        this.connectionState = { startNode: null, endNode: null };
     }
 }
 

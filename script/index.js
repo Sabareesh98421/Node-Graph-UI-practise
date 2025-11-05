@@ -1,16 +1,16 @@
 // index.js
-import { card, domElements } from "./utils.js"
+import { domElements } from "./utils.js"
 import { WorkShop } from "./workShop.js";
-import { Node } from "./nodes.js";
 
-function getAddNodeButton(){
+
+function getAddNodeButton() {
     return domElements("#createNode");
 }
 
 const wS = new WorkShop();
 
-getAddNodeButton().addEventListener("click",()=>{
-    wS.createNode(); 
+getAddNodeButton().addEventListener("click", () => {
+    wS.createNode();
 })
 
 

@@ -1,33 +1,32 @@
 // connectorUtils.js
-import { workspace } from "./utils.js";
-function svgConnector(attribute = {}, tag = "svg") {
-    const SVG_NS = 'http://www.w3.org/2000/svg';
-    const SVG = document.createElementNS(SVG_NS, tag);
-    Object.keys(attribute).forEach((key) => {
-        SVG.setAttribute(key, attribute[key])
-    })
-    return SVG;
+import { svg, workspace } from "./utils.js";
 
-}
-
-
-
-function svgLayer() {
-    const SVG = svgConnector({ height: "100%", width: "100%" })
-
+export function svgLayer() {
+    const SVG = svg();
     const container = workspace();
+    // default styling
     styleSvg(SVG);
     container.append(SVG)
+    /**
+     * I wonder that if I can export as an object then I can simply call the styleSvg to edit according to the node placements right ? 
+     * from this return I can have the default style and yet I can edit it from outside here I just passed the reference so it not a recursion technically
+     * 
+     * */
+    return { SVG, styleSvg }
 }
-function styleSvg(SVG) {
-    if (!(SVG instanceof SVGGraphicsElement)) {
+
+
+function styleSvg(SVG, attribute = {}) {
+    if (!(SVG instanceof SVGElement)) {
         throw new TypeError(`ExpectedElement is SVG `)
     }
     const svgStyle = SVG.style;
     svgStyle.position = "absolute";
-    svgStyle.top = 0;
-    svgStyle.left = 0;
+    svgStyle.top = attribute.position.y || 0;
+    svgStyle.left = attribute.position.x || 0;
     svgStyle.pointerEvents = "none";
-
-
+    SVG.setAttribute('d', attribute.definePath);
+    SVG.setAttribute('stroke', conn.color);
+    SVG.setAttribute('class', 'connection-line');
+    SVG.setAttribute('stroke-dasharray', '10 5');
 }

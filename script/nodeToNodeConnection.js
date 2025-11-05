@@ -1,30 +1,75 @@
 // nodeToNodeConnection.js
-import { Node } from "./nodes.js"
+import { Node } from "./nodes.js";
+import { svgLayer } from "./connectorUtils.js";
+import { edgeAnchorPoints } from "./utils.js";
 export default class NodeConnection {
     connector = {
-        start: [Node.nodeId],
-        end: [Node.nodeId] // another node's ID 
+        start: 0,
+        end: 0 // another node's ID 
     }
-    connectorType = "input" || "output"; // like an tuple.
-    id; // readonly
+
+    // this id Represent each edge of the nodes that this connects
+
+    #id; // readonly
+
     /**
-     * As for now I get nodes data fully after some while we rewfactor it for my conveance only 
+     * 
+     * @param {Node} node 
+     * @param {string} connectorType 
      */
-    constructor() {
-        this.id = this.connector.start[0]; // indicates the connector is belong to which id(similar foreign key ) Origin link;
-    }
-    draw() {
 
-    }
-    curveyDraw() {
-
+    constructor(connector) {
+        this.#setId()
+        this.#setEventListenersToEdgeAnchors();
     }
 
-    #createSvg() {
+    #draw() {
+        let { SVG, styleSvg } = svgLayer();
+        // calculate line position
+        const x1 = startNode.x;
+        const y1 = startNode.y;
+        const x2 = endNode.x;
+        const y2 = endNode.y;
+        SVG.setAttribute("x1", x1);
+        SVG.setAttribute("y1", y1);
+        SVG.setAttribute("x2", x2);
+        SVG.setAttribute("y2", y2);
+        styleSvg(SVG); // default style
+    }
+    #setId() {
+        this.#id = this.connector.start + "-" + this.connector.end;
+    }
+    get id() {
+        return this.#id;
+    }
+    #handleMouseDown_StartAnchor(eve) {
+        this.connector.start = this.#getAnchorId(eve.target);
 
     }
-    // if this is an input then how the data must be passed ? 
-    // does am I been considered about the data? I am just an visualize to the dev/user that the data flows through me so, am I actually carrying data or just pretend to share the data between nodes?
+    #handleMouseUp_EndAnchor(eve) {
+        const end = this.#getAnchorId(eve.target);
+        if (this.#isBreakConnection(end)) return
+        this.connector.end = end
+    }
+    #isBreakConnection(endAnchorId) {
+        return this.connector.start === endAnchorId;
+    }
+    #getAnchorId(target) {
+        return target.id.split("--")[0];
+    }
+    #setEventListenersToEdgeAnchors() {
+        let edges = edgeAnchorPoints();
+        edges.forEach((edge) => {
+            edge.addEventListener("mousedown", (eve) => this.#handleMouseDown_StartAnchor(eve));
+            edge.addEventListener("mousemove", (eve) => this.#draw(eve))
+            edge.addEventListener("mouseup", (eve) => this.#handleMouseUp_EndAnchor(eve));
+        })
+    }
+    // #isValid(connectorType) {
+    //     if (this.validConnectorType.includes(connectorType)) {
+    //         return connectorType
+    //     }
+    //     throw new ReferenceError("THe connector Type Must in two type either Input Or output, but Found " + connectorType)
+    // }
 
-    // ANS: NO,you just pretend bruh!!.
 }

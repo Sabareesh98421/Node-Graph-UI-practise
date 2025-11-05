@@ -1,9 +1,20 @@
+import { Node } from "./nodes.js";
+
 // utils.js
 export function body() {
     return document.body;
 }
-export function workspace(){
+export function svg() {
+    return domElements("#nodeConnector");
+}
+export function workspace() {
     return domElements("#workSpace");
+}
+export function edgeAnchorPoints() {
+    return domElements(".edgeConnector", true);
+}
+export function mainTag() {
+    return domElements("main");
 }
 export function domElements(selector, isEverything = false) {
     if (!isEverything) return document.querySelector(String(selector));
@@ -26,19 +37,75 @@ function cardContent(data) {
 }
 
 export function card(node) {
+    console.table(node);
     const el = document.createElement("div");
     el.className = "nodes";
-    // el.id = "Node-" + node.nodeId
-    el.style.left = node.selfPosition.x + "px";
-    el.style.top = node.selfPosition.y + "px";
+    el.id = "Node-" + node.nodeId
+    // I moved this logic to the wrapper so I can add the edge's anchor point and I move the entire edge and node at my will, because the the edge are calculated from the anchors.
+
+    // the below comment will may not deleted,that because it's for my understand  how things works
+    // el.style.left = node.selfPosition.x + "px";
+    // el.style.top = node.selfPosition.y + "px";
     el.id = `node-${node.nodeId}`;
     // el.textContent = node.displayName + "hi";
     setStyleToNode(el);
-    domElements("#workSpace").appendChild(el);
+    // domElements("#workSpace").appendChild(el);
     el.appendChild(cardHeader(node.displayName + " - " + node.nodeId));
     el.appendChild(cardContent(node.nodeData));
-    new DragNDrop().setElement(el);
+    // new DragNDrop().setElement(el);
     return el;
+}
+
+
+/**
+ * 
+ * @param {Array<string>} requiredSpan 
+ * @param {Node} node 
+ * @returns Array<HTMLSpanElement>
+ */
+function createSpanTags(requiredSpan, node) {
+    /**
+     * @type Array<HTMLSpanElement>
+     */
+    let spansTags = [];
+
+    requiredSpan.map((eachSpan, index) => {
+        let [, , role] = eachSpan.split("-");
+        let span = document.createElement("span");
+        span.setAttribute("id", `node${node.nodeId}--${eachSpan}-${index}`);
+        span.setAttribute("class", `spanTags  connector--${node.nodeId} edgeConnector ${role}`);
+        // span.style[position] = "0px";
+        // span.style[place] = "0px";
+        spansTags.push(span);
+    }
+    )
+    return spansTags;
+}
+/**
+ * 
+ * @param {Node} node 
+ * @returns Array<HTMLSpanElement>
+ */
+function edgeAnchors(node) {
+    // let edgeAnchorPoints=[right,left,top,bottom];
+    // But CUrrently for testing we use only two point in and out points
+    let edgeAnchorPoints = ["left-top-input", "left-bottom-output"];
+    let spanTags = createSpanTags(edgeAnchorPoints, node);;
+    return spanTags;
+}
+
+export function cardWrapper(node) {
+    let nodeWrapper = document.createElement("div");
+    let cardEl = card(node)
+    nodeWrapper.setAttribute("class", "node-wrapper");
+    nodeWrapper.style.left = node.selfPosition.x + "px";
+    nodeWrapper.style.top = node.selfPosition.y + "px";
+    nodeWrapper.id = `node-${node.nodeId}`;
+    domAppend(nodeWrapper, cardEl)
+    domAppend(nodeWrapper, edgeAnchors(node));
+    domElements("#workSpace").appendChild(nodeWrapper);
+    new DragNDrop().setElement(nodeWrapper);
+    return nodeWrapper
 }
 
 function setStyleToNode(el) {
@@ -47,13 +114,29 @@ function setStyleToNode(el) {
     el.style.borderRadius = "5px";
 }
 
+function domAppend(parentElement, child) {
+    if (!(Array.isArray(child) || child instanceof HTMLElement)) throw new Error("the child must be an array or just plain html elements")
+    if (Array.isArray(child)) {
+        appendArrayOfChildHandler(parentElement, child);
+    }
+    else {
+        // just append it
 
+        parentElement.appendChild(child)
+    }
+
+}
+function appendArrayOfChildHandler(parent, child) {
+    child.map((eachSpan) =>
+        parent.appendChild(eachSpan)
+    )
+}
 
 
 
 
 // an utils function for drag and drop this method is about to set in the add event listener 
-export class DragNDrop {
+class DragNDrop {
     #isDragging = false;
     #offsetX = 0;
     #offsetY = 0;

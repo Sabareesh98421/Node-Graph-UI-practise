@@ -1,6 +1,8 @@
 // nodes.js
+import { domElements } from "./utils.js";
 
 export class Node {
+    #selfRef
 
     static nodeId = 0;
     // to know those nodes are available or not 
@@ -31,10 +33,14 @@ export class Node {
         this.connectedNodesId = [];
         // optional: pass boundary from WorkShop
         this.boundary = props.boundary;
+        this.#setConnectorEventLogic()
 
     }
     connect(connectedNodeId) {
         this.connectedNodesId.push(connectedNodeId);
+    }
+    getSelfPosition(){
+        return this.selfPosition;
     }
     spawnNodeInRandomLocation() {
         if (this.nodeId == 1) return;
@@ -51,26 +57,37 @@ export class Node {
             y: newY
         }
     }
+    #setConnectorEventLogic() {
+        if (!(this.#selfRef instanceof HTMLElement)) return;
+        this.#selfRef.addEventListener("click", () => { })
+    }
+
     $ensureNodeSpawnPositionRestricted(calculatedValue, axis = "x") {
         if (this.nodeId === 1 || !this.boundary) return;
         const max = axis === "x" ? this.boundary.width : this.boundary.height
         return calculatedValue < max ? calculatedValue : max - 10
     }
-    // serialization
-    toJson() {
+    get connectionPoints() {
+        const node = domElements(`#node-${this.nodeId}`);
+        if (!node) return null;
+        if ((node instanceof NodeList)) return null;
 
-        // return { ...this }
-        return JSON.stringify(this);
-    }
-    static fromJSON(jsonedNode) {
-        const node = Object.create(Node.prototype);
-        Object.assign(node, jsonedNode);
-
-        // static NodeId counter Update
-        if (node.nodeId >= Node.nodeId) {
-            Node.nodeId = node.nodeId;
+        const rect = node.getBoundingClientRect();
+        return {
+            output: { x: rect.right, y: rect.top + rect.height / 2 },
+            input: { x: rect.LEFT, y: rect.top + rect.height / 2 }
         }
-        return node;
+    }
+
+    get selfRefEle() {
+        return this.#selfRef
+    }
+    set setSelfRefEle(node) {
+        if (!(node instanceof HTMLElement)) throw new TypeError("The node is not HTML Element")
+        if (!(node.classList.contains("nodes"))) {
+            throw new ReferenceError("the selectedNode is not the node ")
+        }
+        this.#selfRef = node;
     }
 }
 
